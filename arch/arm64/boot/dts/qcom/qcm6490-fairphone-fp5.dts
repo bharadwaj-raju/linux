@@ -1309,7 +1309,7 @@
 };
 
 &sound {
-	compatible = "fairphone,fp5-sndcard", "qcom,qcm6490-idp-sndcard";
+	compatible = "fairphone,fp5-sndcard", "qcom,sm8250-sndcard";
 	pinctrl-0 = <&i2s1_active>;
 	pinctrl-names = "default";
 	model = "Fairphone 5";
