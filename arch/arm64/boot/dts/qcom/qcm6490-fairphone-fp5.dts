@@ -1324,7 +1324,7 @@
 		};
 
 		codec {
-			sound-dai = <&aw88261_l>; // , <&aw88261_r>;
+			sound-dai = <&aw88261_l>, <&aw88261_r>;
 		};
 	};
 
