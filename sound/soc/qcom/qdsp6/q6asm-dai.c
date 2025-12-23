@@ -64,6 +64,7 @@ struct q6asm_dai_rtd {
 	uint64_t bytes_received;
 	uint64_t copied_total;
 	uint16_t bits_per_sample;
+	uint16_t sample_word_size;
 	uint16_t source; /* Encoding source bit mask */
 	struct audio_client *audio_client;
 	uint32_t next_track_stream_id;
@@ -274,7 +275,7 @@ static int q6asm_dai_prepare(struct snd_soc_component *component,
 		ret = q6asm_media_format_block_multi_ch_pcm(
 				prtd->audio_client, prtd->stream_id,
 				runtime->rate, runtime->channels, NULL,
-				prtd->bits_per_sample);
+				prtd->bits_per_sample, prtd->sample_word_size);
 	} else if (substream->stream == SNDRV_PCM_STREAM_CAPTURE) {
 		ret = q6asm_enc_cfg_blk_pcm_format_support(prtd->audio_client,
 							   prtd->stream_id,
@@ -473,9 +474,15 @@ static int q6asm_dai_hw_params(struct snd_soc_component *component,
 	switch (params_format(params)) {
 	case SNDRV_PCM_FORMAT_S16_LE:
 		prtd->bits_per_sample = 16;
+		prtd->sample_word_size = 16;
+		break;
+	case SNDRV_PCM_FORMAT_S32_LE:
+		prtd->bits_per_sample = 32;
+		prtd->sample_word_size = 32;
 		break;
 	case SNDRV_PCM_FORMAT_S24_LE:
 		prtd->bits_per_sample = 24;
+		prtd->sample_word_size = 32;
 		break;
 	}
 

@@ -98,6 +98,20 @@ struct asm_multi_channel_pcm_fmt_blk_v2 {
 	u8 channel_mapping[PCM_MAX_NUM_CHANNEL];
 } __packed;
 
+struct asm_multi_channel_pcm_fmt_blk_v4 {
+	struct asm_data_cmd_media_fmt_update_v2 fmt_blk;
+	u16 num_channels;
+	u16 bits_per_sample;
+	u32 sample_rate;
+	u16 is_signed;
+	/* size in bits of the word that each sample will be placed into.
+	   if this is larger than bits_per_sample, the upper bits will be used */
+	u16 sample_word_size;
+	u8 channel_mapping[8];
+	u16 endianness;
+	u16 mode;
+} __packed;
+
 struct asm_flac_fmt_blk_v2 {
 	struct asm_data_cmd_media_fmt_update_v2 fmt_blk;
 	u16 is_stream_info_present;
@@ -1086,6 +1100,7 @@ EXPORT_SYMBOL_GPL(q6asm_run_nowait);
  * @channels: number of audio channels.
  * @channel_map: channel map pointer
  * @bits_per_sample: bits per sample
+ * @sample_word_size: size in bits of word to place samples into.
  *
  * Return: Will be an negative value on error or zero on success
  */
@@ -1093,9 +1108,10 @@ int q6asm_media_format_block_multi_ch_pcm(struct audio_client *ac,
 					  uint32_t stream_id,
 					  uint32_t rate, uint32_t channels,
 					  u8 channel_map[PCM_MAX_NUM_CHANNEL],
-					  uint16_t bits_per_sample)
+					  uint16_t bits_per_sample,
+					  uint16_t sample_word_size)
 {
-	struct asm_multi_channel_pcm_fmt_blk_v2 *fmt;
+	struct asm_multi_channel_pcm_fmt_blk_v4 *fmt;
 	struct apr_pkt *pkt;
 	u8 *channel_mapping;
 	void *p;
@@ -1117,6 +1133,9 @@ int q6asm_media_format_block_multi_ch_pcm(struct audio_client *ac,
 	fmt->bits_per_sample = bits_per_sample;
 	fmt->sample_rate = rate;
 	fmt->is_signed = 1;
+	fmt->sample_word_size = sample_word_size;
+	fmt->endianness = 0;  // little endian
+	fmt->mode = 0;  // default
 
 	channel_mapping = fmt->channel_mapping;
 
